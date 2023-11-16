@@ -1,8 +1,9 @@
 import random,cv2,numpy as np
+import keyboard
 
 
 
-mapa = np.zeros((30,30), dtype=np.uint8)
+mapa = np.zeros((20,20), dtype=np.uint8)
 
 nodos = 1 #random.randint(2,10)
 
@@ -107,23 +108,6 @@ def identificar_salidas(mapa):
             i = j
         else:
             i += 1
-    #salidas['norte'] = [(0, j) for j in range(mapa.shape[1]) if mapa[0, j] == 255]
-
-    # Sur
-    i = 0
-    while i < mapa.shape[1]:
-        if mapa[mapa.shape[0] - 1, i] == 255 and i < mapa.shape[1]:
-            j = i
-            nsalidas += 1
-            salidas[nsalidas] = []
-            while j < mapa.shape[1] and mapa[mapa.shape[0] - 1, j] == 255:
-                salidas[nsalidas].append([mapa.shape[0] - 1,j ])
-                j += 1
-            i = j
-        else:
-            i += 1
-    # salidas['sur'] = [(mapa.shape[0] - 1, j) for j in range(mapa.shape[1]) if mapa[mapa.shape[0] - 1, j] == 255]
-
     # Este
     i = 0
     while i < mapa.shape[0]:
@@ -137,8 +121,19 @@ def identificar_salidas(mapa):
             i = j
         else:
             i += 1
-    #salidas['este'] = [(i, mapa.shape[1] - 1) for i in range(mapa.shape[0]) if mapa[i, mapa.shape[1] - 1] == 255]
-
+    # Sur
+    i = 0
+    while i < mapa.shape[1]:
+        if mapa[mapa.shape[0] - 1, i] == 255 and i < mapa.shape[1]:
+            j = i
+            nsalidas += 1
+            salidas[nsalidas] = []
+            while j < mapa.shape[1] and mapa[mapa.shape[0] - 1, j] == 255:
+                salidas[nsalidas].append([mapa.shape[0] - 1,j ])
+                j += 1
+            i = j
+        else:
+            i += 1
     # Oeste
     i = 0
     while i < mapa.shape[0]:
@@ -152,10 +147,50 @@ def identificar_salidas(mapa):
             i = j
         else:
             i += 1
-    #salidas['oeste'] = [(i, 0) for i in range(mapa.shape[0]) if mapa[i, 0] == 255]
-
     return salidas
 
+def jugador(mapa):
+    height, width = mapa.shape
+# Crear un cuadrado blanco como la imagen que se moverá
+    square_size = 32
+    moving_image = np.ones((square_size, square_size), dtype=np.uint8) * 127 # Cuadrado blanco
+
+    # Asegurarse de que las dimensiones de la imagen móvil sean iguales a las de la región de la imagen
+    h, w = moving_image.shape
+
+    # Posición inicial del centro de la imagen móvil
+    x, y = 300, 300
+
+    while True:
+        # Crear una copia de la imagen de fondo para cada cuadro
+        frame = mapa.copy()
+
+        # Calcular las posiciones de inicio y fin del cuadrado móvil
+        y_start, y_end = max(0, y - h // 2), min(height, y + h // 2)
+        x_start, x_end = max(0, x - w // 2), min(width, x + w // 2)
+        # Escuchar las teclas de flecha y verificar los límites
+        
+        if keyboard.is_pressed('up') and y > h // 2:
+                y -= 1
+        elif keyboard.is_pressed('down') and y < height - h // 2:
+                y += 1
+        elif keyboard.is_pressed('left') and x > w // 2:
+                x -= 1
+        elif keyboard.is_pressed('right') and x < width - w // 2:
+                x += 1
+        # Superponer el cuadrado móvil en la posición actual
+        frame[y_start:y_end, x_start:x_end] = moving_image[:y_end-y_start, :x_end-x_start]
+
+        # Mostrar la ventana
+        cv2.imshow('Mover Cuadrado', frame)
+
+
+        # Salir del bucle cuando se presiona la tecla 'esc'
+        if cv2.waitKey(1) == 27:
+            break
+
+    # Cerrar la ventana y liberar recursos
+    cv2.destroyAllWindows()
 
 
 #principal
@@ -168,6 +203,8 @@ mapas = creacionMapas(nodos,mapa,mx, my, area)
 
 for mapa in mapas.values():
     mapa = cv2.resize(mapa, (600, 600),interpolation=cv2.INTER_NEAREST)
+    jugador(mapa)
+=======
     cv2.imshow('Nueva Imagen',mapa)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
