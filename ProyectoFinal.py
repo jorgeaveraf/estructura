@@ -18,9 +18,18 @@ def posicionAleatoria(mapa):
     mapa[mxa, mya] = 255
     return mxa, mya
 
-def areaNavegable(mapa):
+def porcentajeNavegable(mapa):
     porcentaje = random.randint(50,70)
     return int(porcentaje/100 * mapa.size)
+
+def areaNavegable(mapa):
+    areanavegable = []
+    for i in range(mapa.shape[1]):
+        for j in range(mapa.shape[0]):
+            if mapa[i,j] == 255:
+                areanavegable.append([i,j])
+    return areanavegable
+
 
 def caminoAleatorioMapa(mapa, mxa, mya, area):
     visitadas = []  
@@ -149,38 +158,30 @@ def identificar_salidas(mapa):
             i += 1
     return salidas
 
-def jugador(mapa):
+def jugador(mapa, area_navegable):
     height, width = mapa.shape
-# Crear un cuadrado blanco como la imagen que se moverá
     square_size = 32
-    moving_image = np.ones((square_size, square_size), dtype=np.uint8) * 127 # Cuadrado blanco
+    moving_image = np.ones((square_size, square_size), dtype=np.uint8) * 127
 
-    # Asegurarse de que las dimensiones de la imagen móvil sean iguales a las de la región de la imagen
     h, w = moving_image.shape
-
-    # Posición inicial del centro de la imagen móvil
-    x, y = 300, 300
+    x, y = random.choice(area_navegable)
 
     while True:
-        # Crear una copia de la imagen de fondo para cada cuadro
         frame = mapa.copy()
 
-        # Calcular las posiciones de inicio y fin del cuadrado móvil
         y_start, y_end = max(0, y - h // 2), min(height, y + h // 2)
         x_start, x_end = max(0, x - w // 2), min(width, x + w // 2)
-        # Escuchar las teclas de flecha y verificar los límites
-        
-        if keyboard.is_pressed('up') and y > h // 2:
-                y -= 1
-        elif keyboard.is_pressed('down') and y < height - h // 2:
-                y += 1
-        elif keyboard.is_pressed('left') and x > w // 2:
-                x -= 1
-        elif keyboard.is_pressed('right') and x < width - w // 2:
-                x += 1
-        # Superponer el cuadrado móvil en la posición actual
-        frame[y_start:y_end, x_start:x_end] = moving_image[:y_end-y_start, :x_end-x_start]
 
+        if keyboard.is_pressed('up') and y > h // 2 and [x, y - 1] in area_navegable:
+            y -= 1
+        elif keyboard.is_pressed('down') and y < height - h // 2 and [x, y + 1] in area_navegable:
+            y += 1
+        elif keyboard.is_pressed('left') and x > w // 2 and [x - 1, y] in area_navegable:
+            x -= 1
+        elif keyboard.is_pressed('right') and x < width - w // 2 and [x + 1, y] in area_navegable:
+            x += 1
+
+        frame[y_start:y_end, x_start:x_end] = moving_image[:y_end-y_start, :x_end-x_start]
         # Mostrar la ventana
         cv2.imshow('Mover Cuadrado', frame)
 
@@ -197,14 +198,14 @@ def jugador(mapa):
 
 mx, my = posicionAleatoria(mapa)
 
-area = areaNavegable(mapa)
+area = porcentajeNavegable(mapa)
 
 mapas = creacionMapas(nodos,mapa,mx, my, area)
+area = areaNavegable(mapa)
 
 for mapa in mapas.values():
     mapa = cv2.resize(mapa, (600, 600),interpolation=cv2.INTER_NEAREST)
-    jugador(mapa)
-=======
+    jugador(mapa, area)
     cv2.imshow('Nueva Imagen',mapa)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
