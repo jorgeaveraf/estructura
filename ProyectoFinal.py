@@ -173,4 +173,4 @@ for mapa in mapas.values():
     cv2.destroyAllWindows()
 
 salidas = identificar_salidas(mapa)
-print(salidas.keys())
+print(salidas.keys()) 
