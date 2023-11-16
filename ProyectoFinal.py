@@ -204,7 +204,6 @@ mapas = creacionMapas(nodos,mapa,mx, my, area)
 for mapa in mapas.values():
     mapa = cv2.resize(mapa, (600, 600),interpolation=cv2.INTER_NEAREST)
     jugador(mapa)
-=======
     cv2.imshow('Nueva Imagen',mapa)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
