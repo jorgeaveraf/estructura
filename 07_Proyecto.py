@@ -156,14 +156,25 @@ def identificar_salidas(mapa):
             i += 1
     return salidas
 
-def jugador(mapa, areanavegable):
+def punto_aparicion(mapa):
     height, width = mapa.shape
     square_size = 30
     moving_image = np.ones((square_size, square_size), dtype=np.uint8) * 127
+    h, w = moving_image.shape
+    while True:
+        x, y = random.choice(areaNavegable(mapa))
+        y_start, y_end = max(0, y - h // 2), min(height, y + h // 2)
+        x_start, x_end = max(0, x - w // 2), min(width, x + w // 2)
+        if not(0 in mapa[y_start:y_end, x_start:x_end]) :
+            return x, y
 
+def jugador(mapa):
+    height, width = mapa.shape
+    square_size = 30
+    moving_image = np.ones((square_size, square_size), dtype=np.uint8) * 127
     h, w = moving_image.shape
 
-    x, y = 300, 300
+    x, y = punto_aparicion(mapa)
     prev_x, prev_y = x, y
 
     while True:
@@ -203,6 +214,8 @@ def jugador(mapa, areanavegable):
         elif keyboard.is_pressed('right'):
             x += 1
 
+
+
         if cv2.waitKey(1) == 27:
             break
 
@@ -220,6 +233,5 @@ mapas = creacionMapas(nodos,mapa,mx, my, area)
 
 for mapa in mapas.values():
     mapa = cv2.resize(mapa, (600, 600),interpolation=cv2.INTER_NEAREST)
-    area = areaNavegable(mapa)
-    jugador(mapa,area)
+    jugador(mapa)
     
