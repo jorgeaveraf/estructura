@@ -18,7 +18,7 @@ def posicionAleatoria(mapa):
     return mxa, mya
 
 def porcentajeNavegable(mapa):
-    porcentaje = random.randint(50,70)
+    porcentaje = random.randint(60,85)
     return int(porcentaje/100 * mapa.size)
 
 def areaNavegable(mapa):
@@ -156,10 +156,8 @@ def identificar_salidas(mapa):
             i += 1
     return salidas
 
-def punto_aparicion(mapa):
+def punto_aparicion(mapa,moving_image):
     height, width = mapa.shape
-    square_size = 30
-    moving_image = np.ones((square_size, square_size), dtype=np.uint8) * 127
     h, w = moving_image.shape
     while True:
         x, y = random.choice(areaNavegable(mapa))
@@ -174,7 +172,7 @@ def jugador(mapa):
     moving_image = np.ones((square_size, square_size), dtype=np.uint8) * 127
     h, w = moving_image.shape
 
-    x, y = punto_aparicion(mapa)
+    x, y = punto_aparicion(mapa,moving_image)
     prev_x, prev_y = x, y
 
     while True:
