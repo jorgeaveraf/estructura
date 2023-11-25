@@ -1,7 +1,5 @@
 import random,cv2,numpy as np, keyboard
 
-
-
 mapa = np.zeros((20,20), dtype=np.uint8)
 
 nodos = 1 #random.randint(2,10)
@@ -9,7 +7,6 @@ nodos = 1 #random.randint(2,10)
 grafo = {}
 
 #Mapas
-
 def posicionAleatoria(mapa):
     mx, my = mapa.shape
     mxa = random.randint(0, mx - 1)
@@ -70,7 +67,6 @@ def creacionMapas(nodos,mapa,mx, my, area):
     return mapas
 
 #Grafo
-
 def preconexion(grafo,nodos,c):
     for i in range(1,nodos+1):
         grafo[i] = []
@@ -158,36 +154,36 @@ def identificar_salidas(mapa):
 
 def punto_aparicion(mapa,moving_image):
     height, width = mapa.shape
+    # square_size = 30
+    # moving_image = np.ones((square_size, square_size), dtype=np.uint8) * 127
     h, w = moving_image.shape
     while True:
+        frame = mapa.copy()
         x, y = random.choice(areaNavegable(mapa))
         y_start, y_end = max(0, y - h // 2), min(height, y + h // 2)
         x_start, x_end = max(0, x - w // 2), min(width, x + w // 2)
+        # frame[y_start:y_end, x_start:x_end] = moving_image[:y_end-y_start, :x_end-x_start]
+        # cv2.imshow('Mover Cuadrado', frame)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
         if not(0 in mapa[y_start:y_end, x_start:x_end]) :
             return x, y
 
 def jugador(mapa):
+    puntos = 100
     height, width = mapa.shape
     square_size = 30
     moving_image = np.ones((square_size, square_size), dtype=np.uint8) * 127
     h, w = moving_image.shape
-
     x, y = punto_aparicion(mapa,moving_image)
     prev_x, prev_y = x, y
-
     while True:
         frame = mapa.copy()
-
         y_start, y_end = max(0, y - h // 2), min(height, y + h // 2)
         x_start, x_end = max(0, x - w // 2), min(width, x + w // 2)
-
         frame[y_start:y_end, x_start:x_end] = moving_image[:y_end-y_start, :x_end-x_start]
-
         cv2.imshow('Mover Cuadrado', frame)
-
         collision = False  # Flag to check if there's a collision
-
-        # Check for collisions with black pixels in the player's area
         for i in range(y_start, y_end):
             for j in range(x_start, x_end):
                 if mapa[i, j] == 0:
@@ -195,14 +191,10 @@ def jugador(mapa):
                     break
                 if collision:
                     break
-
-
         # If there's a collision, revert to the previous position
         if collision:
             x, y = prev_x, prev_y
-
         prev_x, prev_y = x, y
-
         if keyboard.is_pressed('up'):
             y -= 1
         elif keyboard.is_pressed('down'):
@@ -211,18 +203,22 @@ def jugador(mapa):
             x -= 1
         elif keyboard.is_pressed('right'):
             x += 1
-
-
-
+        if collision:
+            puntos = puntos_decremento(puntos)
+        else:
+            puntos = puntos_incremento(puntos)
         if cv2.waitKey(1) == 27:
             break
-
     cv2.destroyAllWindows()
 
+def puntos_incremento(puntos):
+    puntos+= 1
+    return puntos
 
-
+def puntos_decremento(puntos):
+    puntos-= 1
+    return puntos
 #principal
-
 mx, my = posicionAleatoria(mapa)
 
 area = porcentajeNavegable(mapa)
