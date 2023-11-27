@@ -169,47 +169,72 @@ def punto_aparicion(mapa,moving_image):
         if not(0 in mapa[y_start:y_end, x_start:x_end]) :
             return x, y
 
-def jugador(mapa):
+
+
+
+
+def jugador(mapa, salidas):
     puntos = 100
     height, width = mapa.shape
-    square_size = 30
+    square_size = 20
     moving_image = np.ones((square_size, square_size), dtype=np.uint8) * 127
     h, w = moving_image.shape
-    x, y = punto_aparicion(mapa,moving_image)
+    x, y = punto_aparicion(mapa, moving_image)
     prev_x, prev_y = x, y
+
     while True:
         frame = mapa.copy()
         y_start, y_end = max(0, y - h // 2), min(height, y + h // 2)
         x_start, x_end = max(0, x - w // 2), min(width, x + w // 2)
         frame[y_start:y_end, x_start:x_end] = moving_image[:y_end-y_start, :x_end-x_start]
+        
+        for salida, coordenadas in salidas.items():
+            esquina_superior_izquierda = [x_start, y_start]
+            esquina_superior_derecha = [x_end, y_start]
+            esquina_inferior_izquierda = [x_start, y_end]
+            esquina_inferior_derecha = [x_end, y_end]
+            if (esquina_superior_izquierda in coordenadas or
+                esquina_superior_derecha in coordenadas or
+                esquina_inferior_izquierda in coordenadas or
+                esquina_inferior_derecha in coordenadas):
+                print("¡Has tocado una salida! Cambiando de mapa...")
+
         cv2.imshow('Mover Cuadrado', frame)
         collision = False  # Flag to check if there's a collision
+
         for i in range(y_start, y_end):
             for j in range(x_start, x_end):
                 if mapa[i, j] == 0:
                     collision = True
                     break
-                if collision:
-                    break
+            if collision:
+                break
+
         # If there's a collision, revert to the previous position
         if collision:
             x, y = prev_x, prev_y
+
         prev_x, prev_y = x, y
-        if keyboard.is_pressed('up'):
+
+        if keyboard.is_pressed('up') and y > h // 2:
             y -= 1
-        elif keyboard.is_pressed('down'):
+        elif keyboard.is_pressed('down') and y < height - h // 2:
             y += 1
-        elif keyboard.is_pressed('left'):
+        elif keyboard.is_pressed('left') and x > w // 2:
             x -= 1
-        elif keyboard.is_pressed('right'):
+        elif keyboard.is_pressed('right') and x < width - w // 2:
             x += 1
+
         if collision:
             puntos = puntos_decremento(puntos)
         else:
             puntos = puntos_incremento(puntos)
+
         if cv2.waitKey(1) == 27:
             break
+
     cv2.destroyAllWindows()
+
 
 def puntos_incremento(puntos):
     puntos+= 1
@@ -218,6 +243,8 @@ def puntos_incremento(puntos):
 def puntos_decremento(puntos):
     puntos-= 1
     return puntos
+
+
 #principal
 mx, my = posicionAleatoria(mapa)
 
@@ -227,5 +254,5 @@ mapas = creacionMapas(nodos,mapa,mx, my, area)
 
 for mapa in mapas.values():
     mapa = cv2.resize(mapa, (600, 600),interpolation=cv2.INTER_NEAREST)
-    jugador(mapa)
-    
+    salidas = identificar_salidas(mapa)
+    jugador(mapa,salidas)
