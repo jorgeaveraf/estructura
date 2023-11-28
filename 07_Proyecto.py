@@ -170,9 +170,6 @@ def punto_aparicion(mapa,moving_image):
             return x, y
 
 
-
-
-
 def jugador(mapa, salidas):
     puntos = 100
     height, width = mapa.shape
