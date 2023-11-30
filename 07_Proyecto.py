@@ -2,7 +2,7 @@ import random, cv2, numpy as np, keyboard
 
 mapa = np.zeros((20, 20), dtype=np.uint8)
 
-nodos = 1  # Puedes cambiar este valor según tus necesidades, actualmente está establecido en 1
+nodos = random.randint(3, 10)
 grafo = {}
 
 # Mapas
@@ -92,10 +92,7 @@ def conexiones(grafo, nodos, c):
                 if randc != randn:
                     if len(grafo[randn]) < 3:
                         grafo[randn].append(randc)
-                        c -= 1
-                    else:
-                        c = 0
-    return grafo
+                        grafo[randc].append(randn)
 
 # Juego
 def identificar_salidas(mapa):
@@ -141,6 +138,10 @@ def punto_aparicion(mapa, moving_image):
         if not (0 in mapa[y_start:y_end, x_start:x_end]):
             return x, y
 
+
+ESCAPE_KEY = 27
+UP_KEY, DOWN_KEY, LEFT_KEY, RIGHT_KEY = 'up', 'down', 'left', 'right'
+
 def jugador(mapa, salidas):
     puntos = 100
     height, width = mapa.shape
@@ -167,6 +168,9 @@ def jugador(mapa, salidas):
                     esquina_inferior_derecha in coordenadas):
                 print("¡Has tocado una salida! Cambiando de mapa...")
 
+                return True
+
+
         cv2.imshow('Mover Cuadrado', frame)
         collision = False  # Flag to check if there's a collision
 
@@ -184,13 +188,13 @@ def jugador(mapa, salidas):
 
         prev_x, prev_y = x, y
 
-        if keyboard.is_pressed('up') and y > h // 2:
+        if keyboard.is_pressed(UP_KEY) and y > h // 2:
             y -= 2
-        elif keyboard.is_pressed('down') and y < height - h // 2:
+        elif keyboard.is_pressed(DOWN_KEY) and y < height - h // 2:
             y += 2
-        elif keyboard.is_pressed('left') and x > w // 2:
+        elif keyboard.is_pressed(LEFT_KEY) and x > w // 2:
             x -= 2
-        elif keyboard.is_pressed('right') and x < width - w // 2:
+        elif keyboard.is_pressed(RIGHT_KEY) and x < width - w // 2:
             x += 2
 
         if collision:
@@ -198,10 +202,11 @@ def jugador(mapa, salidas):
         else:
             puntos = puntos_incremento(puntos)
 
-        if cv2.waitKey(1) == 27:
+        if cv2.waitKey(1) & 0xFF == ESCAPE_KEY:
             break
 
-    cv2.destroyAllWindows()
+    return False
+    
 
 def puntos_incremento(puntos):
     puntos += 1
@@ -215,10 +220,42 @@ def puntos_decremento(puntos):
 mx, my = posicionAleatoria(mapa)
 
 area = porcentajeNavegable(mapa)
-
 mapas = creacionMapas(nodos, mapa, mx, my, area)
+grafo = conexiones(grafo, nodos, nodos - 1)
 
-for mapa in mapas.values():
-    mapa = cv2.resize(mapa, (600, 600), interpolation=cv2.INTER_NEAREST)
-    salidas = identificar_salidas(mapa)
-    jugador(mapa, salidas)
+# Imprimir el grafo
+print("Grafo:")
+for nodo, salidas in grafo.items():
+    print(f"Nodo {nodo}: Salidas conectadas a nodos {salidas}")
+
+# Seleccionar el primer mapa
+mapa = next(iter(mapas.values()))
+
+mapa = cv2.resize(mapa, (600, 600), interpolation=cv2.INTER_NEAREST)
+salidas = identificar_salidas(mapa)
+jugador(mapa, salidas)
+
+while True:
+    toco_salida = jugador(mapa, salidas)
+    if toco_salida:
+        if not mapas:
+            print("¡Felicidades, has completado todos los mapas!")
+            break  # Puedes decidir qué hacer cuando se completan todos los mapas
+        else:
+            # Eliminar el mapa actual de la colección
+            del mapas[next(iter(mapas))]
+            
+            # Cargar el siguiente mapa
+            if mapas:
+                mapa = next(iter(mapas.values()))
+                mapa = cv2.resize(mapa, (600, 600), interpolation=cv2.INTER_NEAREST)
+                salidas = identificar_salidas(mapa)
+            else:
+                print("¡Felicidades, has completado todos los mapas!")
+                break
+    if cv2.waitKey(1) & 0xFF == ESCAPE_KEY:  # Verifica si se presiona "esc"
+        break
+'''
+
+'''
+
