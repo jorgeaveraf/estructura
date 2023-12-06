@@ -220,7 +220,6 @@ def jugador(mapa, salidas):
 
     return False
     
-
 def puntos_incremento(puntos):
     puntos += 1
     return puntos
