@@ -173,6 +173,7 @@ def jugador(mapa, salidas):
                 print("¡Has tocado una salida! Cambiando de mapa...")
                 return True
 
+
         cv2.imshow('Mover Cuadrado', frame)
         collision = False  # Flag to check if there's a collision
 
@@ -208,7 +209,6 @@ def jugador(mapa, salidas):
         elif moving_direction == 'left' and x > w // 2:
             x -= 2
         elif moving_direction == 'right' and x < width - w // 2:
-            x += 2
 
         if collision:
             puntos = puntos_decremento(puntos)
@@ -269,3 +269,4 @@ while True:
 '''
 
 '''
+
