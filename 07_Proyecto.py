@@ -210,6 +210,7 @@ def jugador(mapa, salidas):
             x -= 2
         elif moving_direction == 'right' and x < width - w // 2:
             x += 2
+
         if collision:
             puntos = puntos_decremento(puntos)
         else:
