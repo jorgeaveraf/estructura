@@ -153,6 +153,7 @@ def jugador(mapa, salidas):
     h, w = moving_image.shape
     x, y = punto_aparicion(mapa, moving_image)
     prev_x, prev_y = x, y
+    moving_direction = None
 
     while True:
         frame = mapa.copy()
@@ -188,13 +189,25 @@ def jugador(mapa, salidas):
 
         prev_x, prev_y = x, y
 
-        if keyboard.is_pressed(UP_KEY) and y > h // 2:
+        # Check continuous movement based on arrow keys
+        if keyboard.is_pressed('up'):
+            moving_direction = 'up'
+        elif keyboard.is_pressed('down'):
+            moving_direction = 'down'
+        elif keyboard.is_pressed('left'):
+            moving_direction = 'left'
+        elif keyboard.is_pressed('right'):
+            moving_direction = 'right'
+
+
+         # Move continuously in the current direction
+        if moving_direction == 'up' and y > h // 2:
             y -= 2
-        elif keyboard.is_pressed(DOWN_KEY) and y < height - h // 2:
+        elif moving_direction == 'down' and y < height - h // 2:
             y += 2
-        elif keyboard.is_pressed(LEFT_KEY) and x > w // 2:
+        elif moving_direction == 'left' and x > w // 2:
             x -= 2
-        elif keyboard.is_pressed(RIGHT_KEY) and x < width - w // 2:
+        elif moving_direction == 'right' and x < width - w // 2:
             x += 2
 
         if collision:
