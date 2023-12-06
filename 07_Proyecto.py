@@ -170,7 +170,6 @@ def jugador(mapa, salidas):
                     esquina_inferior_izquierda in coordenadas or
                     esquina_inferior_derecha in coordenadas):
                 print("¡Has tocado una salida! Cambiando de mapa...")
-                return True
 
         cv2.imshow('Mover Cuadrado', frame)
         collision = False  # Flag to check if there's a collision
@@ -182,6 +181,7 @@ def jugador(mapa, salidas):
                     break
             if collision:
                 break
+
 
         if collision:
             x, y = prev_x, prev_y
@@ -218,6 +218,7 @@ def puntos_decremento(puntos):
 
 # Principal
 mx, my = posicionAleatoria(mapa)
+
 area = porcentajeNavegable(mapa)
 mapas = creacionMapas(nodos, mapa, mx, my, area)
 grafo = conexiones(grafo, nodos, nodos - 1)
@@ -257,3 +258,4 @@ while True:
 '''
 
 '''
+
