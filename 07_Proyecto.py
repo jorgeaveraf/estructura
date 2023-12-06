@@ -93,6 +93,10 @@ def conexiones(grafo, nodos, c):
                     if len(grafo[randn]) < 3:
                         grafo[randn].append(randc)
                         grafo[randc].append(randn)
+                        c -= 1
+                    else:
+                        c = 0
+    return grafo
 
 # Juego
 def identificar_salidas(mapa):
@@ -138,7 +142,6 @@ def punto_aparicion(mapa, moving_image):
         if not (0 in mapa[y_start:y_end, x_start:x_end]):
             return x, y
 
-
 ESCAPE_KEY = 27
 UP_KEY, DOWN_KEY, LEFT_KEY, RIGHT_KEY = 'up', 'down', 'left', 'right'
 
@@ -168,9 +171,6 @@ def jugador(mapa, salidas):
                     esquina_inferior_derecha in coordenadas):
                 print("¡Has tocado una salida! Cambiando de mapa...")
 
-                return True
-
-
         cv2.imshow('Mover Cuadrado', frame)
         collision = False  # Flag to check if there's a collision
 
@@ -182,7 +182,7 @@ def jugador(mapa, salidas):
             if collision:
                 break
 
-        # If there's a collision, revert to the previous position
+
         if collision:
             x, y = prev_x, prev_y
 
