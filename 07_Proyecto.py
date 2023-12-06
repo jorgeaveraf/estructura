@@ -183,7 +183,6 @@ def jugador(mapa, salidas):
             if collision:
                 break
 
-        # If there's a collision, revert to the previous position
         if collision:
             x, y = prev_x, prev_y
 
